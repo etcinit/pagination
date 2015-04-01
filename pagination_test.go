@@ -1,6 +1,7 @@
 package pagination
 
 import (
+	"net/http"
 	"testing"
 )
 
@@ -16,6 +17,27 @@ func Test_CurrentPageNormalization(t *testing.T) {
 	}
 
 	none := New(73, 25, 2)
+	if none.CurrentPage() != 2 {
+		t.Errorf("New did normalize current page when not needed")
+	}
+}
+
+func Test_CurrentPageNormalizationWithRequest(t *testing.T) {
+	reqOne, _ := http.NewRequest("GET", "http://10.0.0.1/", nil)
+	reqTwo, _ := http.NewRequest("GET", "http://10.0.0.1/?page=7", nil)
+	reqThree, _ := http.NewRequest("GET", "http://10.0.0.1/?page=2", nil)
+
+	zero := NewFromRequest(10, 2, reqOne)
+	if zero.CurrentPage() != 1 {
+		t.Errorf("New did not normalize current page to 1 based index")
+	}
+
+	upper := NewFromRequest(10, 2, reqTwo)
+	if upper.CurrentPage() != 5 {
+		t.Errorf("New did not normalize current page to last page on overflow")
+	}
+
+	none := NewFromRequest(73, 25, reqThree)
 	if none.CurrentPage() != 2 {
 		t.Errorf("New did normalize current page when not needed")
 	}

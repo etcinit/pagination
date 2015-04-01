@@ -2,6 +2,8 @@ package pagination
 
 import (
 	"math"
+	"net/http"
+	"strconv"
 )
 
 // Pagination is a general purpose pagination type, it knows how to calculate
@@ -36,6 +38,15 @@ func New(numberOfItems, itemsPerPage, currentPage int) *Pagination {
 		numberOfItems: numberOfItems,
 		currentPage:   currentPage,
 	}
+}
+
+// NewFromRequest retusn a new Pagination with the provided values. However,
+// unlike New, it uses an HTTP request to parse the page number to use.
+func NewFromRequest(numberOfItems int, itemsPerPage int, req *http.Request) *Pagination {
+	currentPageString := req.URL.Query().Get("page")
+	currentPage, _ := strconv.Atoi(currentPageString)
+
+	return New(numberOfItems, itemsPerPage, currentPage)
 }
 
 // PagesStream returns a channel that will be incremented to
