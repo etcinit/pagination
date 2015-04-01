@@ -3,6 +3,8 @@ package pagination
 import (
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_CurrentPageNormalization(t *testing.T) {
@@ -20,6 +22,15 @@ func Test_CurrentPageNormalization(t *testing.T) {
 	if none.CurrentPage() != 2 {
 		t.Errorf("New did normalize current page when not needed")
 	}
+}
+
+func Test_ToPagination(t *testing.T) {
+	pagination := New(10, 2, 0).ToPagination()
+
+	assert.Equal(t, 1, pagination.CurrentPage)
+	assert.Equal(t, 10, pagination.NumberOfItems)
+	assert.Equal(t, 2, pagination.ItemsPerPage)
+	assert.Equal(t, 0, pagination.Offset)
 }
 
 func Test_CurrentPageNormalizationWithRequest(t *testing.T) {

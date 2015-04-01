@@ -29,12 +29,12 @@ const tmpl string = `
 
 // HTML is a specialised paginator that also knows how to represent the pagination as a HTML list.
 type HTML struct {
-	*Pagination
+	*Paginator
 }
 
 // NewHTML returns a new html pagination with the provided values.
 func NewHTML(numberOfItems, itemsPerPage, currentPage int) *HTML {
-	return &HTML{Pagination: New(numberOfItems, itemsPerPage, currentPage)}
+	return &HTML{Paginator: New(numberOfItems, itemsPerPage, currentPage)}
 }
 
 // Render returns the HTML representation of the pagination.
