@@ -3,6 +3,7 @@ package pagination
 import (
 	"math"
 	"net/http"
+	"reflect"
 	"strconv"
 )
 
@@ -75,6 +76,33 @@ func (p *Paginator) ToPagination() Pagination {
 		TotalPages:    p.NumberOfPages(),
 		Data:          make([]interface{}, 0),
 	}
+}
+
+// ToPaginationWithData is like ToPagination but it also includes some arbitrary
+// data, which usually ends up being the databa being paginated.
+func (p *Paginator) ToPaginationWithData(slice interface{}) Pagination {
+	pagination := p.ToPagination()
+
+	pagination.Data = interfaceSlice(slice)
+
+	return pagination
+}
+
+// interfaceSlice converts a type slice into a more relaxed []interface{}
+// which is used specifically for JSON encoding.
+func interfaceSlice(slice interface{}) []interface{} {
+	s := reflect.ValueOf(slice)
+	if s.Kind() != reflect.Slice {
+		panic("interfaceSlice given a non-slice type")
+	}
+
+	ret := make([]interface{}, s.Len())
+
+	for i := 0; i < s.Len(); i++ {
+		ret[i] = s.Index(i).Interface()
+	}
+
+	return ret
 }
 
 // PagesStream returns a channel that will be incremented to
